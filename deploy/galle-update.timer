@@ -1,0 +1,11 @@
+[Unit]
+Description=Check for Galle Font Terminal updates periodically
+
+[Timer]
+# Run 1 min after boot, then every 5 minutes.
+OnBootSec=1min
+OnUnitActiveSec=5min
+Persistent=true
+
+[Install]
+WantedBy=timers.target

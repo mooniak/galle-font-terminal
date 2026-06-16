@@ -1,0 +1,24 @@
+[Unit]
+Description=Galle Font Terminal kiosk (Chromium fullscreen via cage)
+After=systemd-user-sessions.service network-online.target
+Wants=network-online.target
+
+[Service]
+User=pi
+# cage is a minimal Wayland kiosk compositor; it runs one app fullscreen.
+# --disable-restore-session-state + kiosk flags keep Chromium locked down.
+Environment=XDG_RUNTIME_DIR=/run/user/1000
+ExecStart=/usr/bin/cage -- /usr/bin/chromium-browser \
+  --kiosk \
+  --noerrdialogs \
+  --disable-infobars \
+  --disable-session-crashed-bubble \
+  --disable-restore-session-state \
+  --check-for-update-interval=31536000 \
+  --autoplay-policy=no-user-gesture-required \
+  file:///home/pi/galle-font-terminal/index.html
+Restart=always
+RestartSec=3
+
+[Install]
+WantedBy=multi-user.target

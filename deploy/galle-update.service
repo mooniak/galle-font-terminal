@@ -1,0 +1,8 @@
+[Unit]
+Description=Pull latest Galle Font Terminal and restart kiosk if changed
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/home/pi/galle-font-terminal/deploy/galle-update.sh
