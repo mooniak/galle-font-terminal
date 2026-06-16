@@ -4,7 +4,7 @@ After=systemd-user-sessions.service network-online.target
 Wants=network-online.target
 
 [Service]
-User=pi
+User=mooniak-pi3
 # cage is a minimal Wayland kiosk compositor; it runs one app fullscreen.
 # --disable-restore-session-state + kiosk flags keep Chromium locked down.
 Environment=XDG_RUNTIME_DIR=/run/user/1000
@@ -16,7 +16,7 @@ ExecStart=/usr/bin/cage -- /usr/bin/chromium-browser \
   --disable-restore-session-state \
   --check-for-update-interval=31536000 \
   --autoplay-policy=no-user-gesture-required \
-  file:///home/pi/galle-font-terminal/index.html
+  file:///home/mooniak-pi3/galle-font-terminal/index.html
 Restart=always
 RestartSec=3
 

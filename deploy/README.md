@@ -15,13 +15,13 @@ changes). You develop on your MacBook and just `git push`.
 ## One-time Pi setup
 
 1. Flash **Raspberry Pi OS (64-bit) Lite** (or Desktop) and boot the Pi.
-   Default user is assumed to be `pi`. If yours differs, edit `USER_NAME` /
-   `User=` / paths in the deploy files (and `XDG_RUNTIME_DIR` UID, `id -u pi`).
+   These files are configured for the user `mooniak-pi3`. The installer
+   auto-detects that user's UID for `XDG_RUNTIME_DIR`.
 
 2. SSH in from your Mac and clone the repo to the home folder:
 
    ```bash
-   ssh pi@<pi-ip-address>
+   ssh mooniak-pi3@<pi-ip-address>
    git clone https://github.com/mooniak/galle-font-terminal.git ~/galle-font-terminal
    ```
 

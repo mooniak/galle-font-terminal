@@ -3,7 +3,7 @@
 # Run on the Pi:  sudo bash /home/pi/galle-font-terminal/deploy/install.sh
 set -euo pipefail
 
-USER_NAME="pi"
+USER_NAME="mooniak-pi3"
 REPO_DIR="/home/${USER_NAME}/galle-font-terminal"
 
 if [ "$(id -u)" -ne 0 ]; then
@@ -23,6 +23,11 @@ install -m 0755 "${REPO_DIR}/deploy/galle-update.sh" "${REPO_DIR}/deploy/galle-u
 cp "${REPO_DIR}/deploy/galle-kiosk.service"  /etc/systemd/system/
 cp "${REPO_DIR}/deploy/galle-update.service" /etc/systemd/system/
 cp "${REPO_DIR}/deploy/galle-update.timer"   /etc/systemd/system/
+
+# Patch XDG_RUNTIME_DIR to this user's real UID (may not be 1000).
+USER_UID="$(id -u "$USER_NAME")"
+sed -i "s|XDG_RUNTIME_DIR=/run/user/[0-9]*|XDG_RUNTIME_DIR=/run/user/${USER_UID}|" \
+  /etc/systemd/system/galle-kiosk.service
 
 chmod +x "${REPO_DIR}/deploy/galle-update.sh"
 
