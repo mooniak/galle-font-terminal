@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Pull the latest code; if anything changed, restart the kiosk so the
-# new index.html is shown. Safe to run on a timer.
+# Pull the latest code; if anything changed, kill Chromium so the kiosk
+# launcher loop relaunches with the new index.html. Safe to run on a timer.
 set -euo pipefail
 
 REPO_DIR="/home/mooniak/Desktop/galle-font-terminal"
@@ -14,8 +14,8 @@ git reset --hard --quiet "origin/$BRANCH"
 after="$(git rev-parse HEAD)"
 
 if [ "$before" != "$after" ]; then
-  echo "Updated $before -> $after, restarting kiosk."
-  systemctl restart galle-kiosk.service
+  echo "Updated $before -> $after, reloading kiosk."
+  pkill -f chromium || true
 else
   echo "Already up to date ($after)."
 fi

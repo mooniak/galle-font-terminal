@@ -1,37 +1,44 @@
-# Raspberry Pi 3 Kiosk Deployment
+# Raspberry Pi Kiosk Deployment (Pi OS Desktop)
 
-Runs `index.html` fullscreen on the Pi's screen at boot, and auto-pulls
-updates from GitHub every 5 minutes (restarting the display when the code
+Runs `index.html` fullscreen on the Pi's screen at login/boot, and auto-pulls
+updates from GitHub every 5 minutes (reloading the display when the code
 changes). You develop on your MacBook and just `git push`.
+
+> Target: **Raspberry Pi OS Desktop** with autologin to user `mooniak`, repo
+> cloned at `~/Desktop/galle-font-terminal`.
 
 ## How it works
 
-- **`galle-kiosk.service`** — launches Chromium fullscreen via `cage` (a tiny
-  Wayland kiosk compositor). No desktop environment needed; works on Pi OS Lite.
-- **`galle-update.sh` + `galle-update.timer`** — every 5 min the Pi does a
-  hard `git reset` to `origin/main`; if `index.html` changed, it restarts the
-  kiosk so the new version shows.
+- **`galle-kiosk.sh` + `galle-kiosk.desktop`** — an XDG autostart entry launches
+  Chromium fullscreen (`--kiosk`) inside the desktop session when it loads. The
+  script runs in a loop, so Chromium relaunches if it crashes or is killed for
+  an update. (We do **not** use `cage`/a systemd display service here — that is
+  only for Pi OS Lite, and it fights the desktop for the screen.)
+- **`galle-update.sh` + `galle-update.timer`** — every 5 min the Pi does a hard
+  `git reset` to `origin/main`; if anything changed it kills Chromium, and the
+  launcher loop relaunches with the new `index.html`.
 
 ## One-time Pi setup
 
-1. Flash **Raspberry Pi OS (64-bit) Lite** (or Desktop) and boot the Pi.
-   These files are configured for the user `mooniak`. The installer
-   auto-detects that user's UID for `XDG_RUNTIME_DIR`.
-
-2. SSH in from your Mac and clone the repo to the home folder:
+1. On the Pi (Desktop), open a terminal and clone the repo to the Desktop:
 
    ```bash
-   ssh mooniak@<pi-ip-address>
-   git clone https://github.com/mooniak/galle-font-terminal.git ~/galle-font-terminal
+   git clone https://github.com/mooniak/galle-font-terminal.git ~/Desktop/galle-font-terminal
    ```
 
-3. Run the installer:
+2. Run the installer:
 
    ```bash
-   sudo bash ~/galle-font-terminal/deploy/install.sh
+   bash ~/Desktop/galle-font-terminal/deploy/install.sh
    ```
 
-That's it. The kiosk launches now and on every boot.
+3. Reboot:
+
+   ```bash
+   sudo reboot
+   ```
+
+The kiosk launches automatically after the desktop logs in.
 
 ## Pushing updates from your MacBook
 
@@ -44,29 +51,34 @@ git push origin main
 ```
 
 Within ~5 minutes the Pi pulls it and reloads automatically. To apply
-immediately, SSH in and run:
+immediately, on the Pi run:
 
 ```bash
 sudo systemctl start galle-update.service
 ```
 
-> Note: the Pi uses a public `https` clone and `git reset --hard`, so it only
-> ever **pulls**. Never commit on the Pi itself — local changes get discarded.
+> Note: the Pi uses `git reset --hard`, so it only ever **pulls**. Never commit
+> on the Pi itself — local changes get discarded.
 
 ## Useful commands (on the Pi)
 
 ```bash
-journalctl -u galle-kiosk -f         # watch kiosk logs
-journalctl -u galle-update -f        # watch update logs
-systemctl status galle-update.timer  # see next scheduled check
-systemctl restart galle-kiosk        # force a reload
+journalctl -u galle-update -f          # watch update logs
+systemctl status galle-update.timer    # see next scheduled check
+pkill -f chromium                      # force a reload now
+~/Desktop/galle-font-terminal/deploy/galle-kiosk.sh   # test the launcher
 ```
+
+## Exiting the kiosk
+
+Press `Ctrl`+`Alt`+`F2` for a text console, log in, and run
+`pkill -f galle-kiosk.sh` then `pkill -f chromium`. Or SSH in and do the same.
 
 ## Tuning
 
 - **Update frequency:** edit `OnUnitActiveSec=5min` in `galle-update.timer`.
-- **Hide mouse cursor / screen blanking:** add to the `cage` ExecStart flags or
-  disable blanking with `xset`/`wlr-randr` as needed.
 - **Different branch:** change `BRANCH` in `galle-update.sh`.
 
-After editing any unit file, re-copy it and run `sudo systemctl daemon-reload`.
+After editing the timer/service, re-copy them to `/etc/systemd/system/` and run
+`sudo systemctl daemon-reload`. After editing the autostart entry, copy it to
+`~/.config/autostart/`.

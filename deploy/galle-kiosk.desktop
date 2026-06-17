@@ -1,0 +1,6 @@
+[Desktop Entry]
+Type=Application
+Name=Galle Font Terminal Kiosk
+Exec=/home/mooniak/Desktop/galle-font-terminal/deploy/galle-kiosk.sh
+X-GNOME-Autostart-enabled=true
+NoDisplay=true
