@@ -5,4 +5,4 @@ Wants=network-online.target
 
 [Service]
 Type=oneshot
-ExecStart=/home/mooniak-pi3/galle-font-terminal/deploy/galle-update.sh
+ExecStart=/home/mooniak-pi4/galle-font-terminal/deploy/galle-update.sh

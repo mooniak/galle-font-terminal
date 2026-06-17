@@ -3,7 +3,7 @@
 # Run on the Pi:  sudo bash /home/pi/galle-font-terminal/deploy/install.sh
 set -euo pipefail
 
-USER_NAME="mooniak-pi3"
+USER_NAME="mooniak-pi4"
 REPO_DIR="/home/${USER_NAME}/galle-font-terminal"
 
 if [ "$(id -u)" -ne 0 ]; then
