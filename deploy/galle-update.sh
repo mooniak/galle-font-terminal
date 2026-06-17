@@ -3,7 +3,7 @@
 # new index.html is shown. Safe to run on a timer.
 set -euo pipefail
 
-REPO_DIR="/home/mooniak/galle-font-terminal"
+REPO_DIR="/home/mooniak/Desktop/galle-font-terminal"
 BRANCH="main"
 
 cd "$REPO_DIR"
