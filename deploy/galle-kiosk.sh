@@ -6,6 +6,10 @@
 REPO_DIR="$HOME/Desktop/galle-font-terminal"
 URL="file://${REPO_DIR}/index.html"
 
+# Chromium runs on the X11 (XWayland) backend; make sure it has a display
+# even when launched from the Wayland session's autostart.
+export DISPLAY="${DISPLAY:-:0}"
+
 # Route input through IBus so Sinhala (Wijesekara) works inside Chromium.
 export GTK_IM_MODULE=ibus
 export QT_IM_MODULE=ibus
