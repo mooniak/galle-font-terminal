@@ -11,6 +11,17 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
+# Find the Chromium binary (Bookworm uses "chromium", older uses
+# "chromium-browser").
+if command -v chromium >/dev/null 2>&1; then
+  CHROME=chromium
+elif command -v chromium-browser >/dev/null 2>&1; then
+  CHROME=chromium-browser
+else
+  echo "ERROR: chromium not installed" >&2
+  exit 1
+fi
+
 # Clean Chromium exit flags so it never shows the "restore pages" bar.
 PROFILE="$HOME/.config/chromium"
 
@@ -22,7 +33,7 @@ while true; do
     sed -i 's/"exit_type":"Crashed"/"exit_type":"Normal"/' "$PROFILE/Default/Preferences" 2>/dev/null || true
   fi
 
-  chromium-browser \
+  "$CHROME" \
     --kiosk \
     --noerrdialogs \
     --disable-infobars \
