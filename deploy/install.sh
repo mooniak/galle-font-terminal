@@ -26,11 +26,15 @@ chmod +x "${REPO_DIR}/deploy/galle-kiosk.sh" "${REPO_DIR}/deploy/galle-update.sh
 LAUNCHER="${REPO_DIR}/deploy/galle-kiosk.sh"
 
 # Pi OS Bookworm Desktop uses the labwc Wayland compositor, which reads its
-# own autostart file (NOT ~/.config/autostart). Wire the kiosk in there.
+# own autostart file (NOT ~/.config/autostart). Start from the system default
+# (so the panel still loads) then append our launcher.
 mkdir -p "${HOME_DIR}/.config/labwc"
 LABWC_AUTOSTART="${HOME_DIR}/.config/labwc/autostart"
+if [ ! -f "$LABWC_AUTOSTART" ] && [ -f /etc/xdg/labwc/autostart ]; then
+  cp /etc/xdg/labwc/autostart "$LABWC_AUTOSTART"
+fi
 touch "$LABWC_AUTOSTART"
-grep -qF "$LAUNCHER" "$LABWC_AUTOSTART" || echo "${LAUNCHER} &" >> "$LABWC_AUTOSTART"
+grep -qF "galle-kiosk.sh" "$LABWC_AUTOSTART" || echo "${LAUNCHER} &" >> "$LABWC_AUTOSTART"
 
 # Also drop an XDG autostart entry as a fallback for wayfire/X11 sessions.
 mkdir -p "${HOME_DIR}/.config/autostart"
