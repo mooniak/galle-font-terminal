@@ -23,6 +23,16 @@ sudo git config --global --add safe.directory "$REPO_DIR" || true
 
 echo ">> Installing kiosk autostart entry..."
 chmod +x "${REPO_DIR}/deploy/galle-kiosk.sh" "${REPO_DIR}/deploy/galle-update.sh"
+LAUNCHER="${REPO_DIR}/deploy/galle-kiosk.sh"
+
+# Pi OS Bookworm Desktop uses the labwc Wayland compositor, which reads its
+# own autostart file (NOT ~/.config/autostart). Wire the kiosk in there.
+mkdir -p "${HOME_DIR}/.config/labwc"
+LABWC_AUTOSTART="${HOME_DIR}/.config/labwc/autostart"
+touch "$LABWC_AUTOSTART"
+grep -qF "$LAUNCHER" "$LABWC_AUTOSTART" || echo "${LAUNCHER} &" >> "$LABWC_AUTOSTART"
+
+# Also drop an XDG autostart entry as a fallback for wayfire/X11 sessions.
 mkdir -p "${HOME_DIR}/.config/autostart"
 cp "${REPO_DIR}/deploy/galle-kiosk.desktop" "${HOME_DIR}/.config/autostart/"
 
