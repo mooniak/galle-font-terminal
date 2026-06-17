@@ -6,6 +6,13 @@
 REPO_DIR="$HOME/Desktop/galle-font-terminal"
 URL="file://${REPO_DIR}/index.html"
 
+# Route input through IBus so Sinhala (Wijesekara) works inside Chromium.
+export GTK_IM_MODULE=ibus
+export QT_IM_MODULE=ibus
+export XMODIFIERS=@im=ibus
+# Make sure the IBus daemon is running for this session.
+pgrep -x ibus-daemon >/dev/null || ibus-daemon -drx 2>/dev/null &
+
 # Disable screen blanking / power saving (best-effort, X11 only).
 xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
@@ -41,7 +48,7 @@ while true; do
     --disable-restore-session-state \
     --check-for-update-interval=31536000 \
     --autoplay-policy=no-user-gesture-required \
-    --ozone-platform-hint=auto \
+    --ozone-platform=x11 \
     "$URL"
 
   # If Chromium exits (crash or killed for update), wait then relaunch.
