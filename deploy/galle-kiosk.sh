@@ -9,6 +9,22 @@ exec >> "$HOME/kiosk.log" 2>&1
 echo "=================================================="
 echo "kiosk launcher started: $(date)"
 
+# Single-instance lock: if another launcher is already running, exit. This
+# prevents duplicate kiosks and the "Opening in existing browser session"
+# reload storm.
+exec 9>"$HOME/.galle-kiosk.lock"
+if ! flock -n 9; then
+  echo "another launcher already running; exiting."
+  exit 0
+fi
+
+# Dedicated profile dir so the kiosk never hands off to another Chromium
+# instance (which would make this process exit immediately and loop).
+KIOSK_PROFILE="$HOME/.kiosk-chrome"
+
+# Kill any stray Chromium from a previous run before we start.
+pkill -f "user-data-dir=${KIOSK_PROFILE}" 2>/dev/null || true
+
 REPO_DIR="$HOME/Desktop/galle-font-terminal"
 URL="file://${REPO_DIR}/index.html"
 
@@ -50,21 +66,21 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
-PROFILE="$HOME/.config/chromium"
-
 while true; do
   # NOTE: git is handled solely by the update service/timer. The launcher must
   # never touch git, or it races the updater and causes spurious reloads.
 
   # Clear crash/exit flags so no "restore pages" bubble appears.
-  if [ -f "$PROFILE/Default/Preferences" ]; then
-    sed -i 's/"exit_type":"Crashed"/"exit_type":"Normal"/' "$PROFILE/Default/Preferences" 2>/dev/null || true
+  if [ -f "$KIOSK_PROFILE/Default/Preferences" ]; then
+    sed -i 's/"exit_type":"Crashed"/"exit_type":"Normal"/' "$KIOSK_PROFILE/Default/Preferences" 2>/dev/null || true
   fi
 
   echo "launching chromium: $(date)"
   "$CHROME" \
     --kiosk \
+    --user-data-dir="$KIOSK_PROFILE" \
     --noerrdialogs \
+    --nofirstrun \
     --disable-infobars \
     --disable-session-crashed-bubble \
     --disable-restore-session-state \
