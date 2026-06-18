@@ -87,6 +87,10 @@ while true; do
     --check-for-update-interval=31536000 \
     --autoplay-policy=no-user-gesture-required \
     --ozone-platform=x11 \
+    --no-sandbox \
+    --disable-dev-shm-usage \
+    --disable-gpu \
+    --disable-features=VizDisplayCompositor \
     "$URL"
   echo "chromium exited ($?): $(date)"
 
