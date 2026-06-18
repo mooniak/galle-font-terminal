@@ -66,6 +66,10 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
+# Hide the mouse pointer (needs the "unclutter" package).
+pkill -x unclutter 2>/dev/null || true
+unclutter -idle 0 -root 2>/dev/null &
+
 while true; do
   # NOTE: git is handled solely by the update service/timer. The launcher must
   # never touch git, or it races the updater and causes spurious reloads.

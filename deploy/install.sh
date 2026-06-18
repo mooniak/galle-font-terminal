@@ -9,7 +9,7 @@ REPO_DIR="${HOME_DIR}/Desktop/galle-font-terminal"
 
 echo ">> Installing packages (chromium + git)..."
 sudo apt-get update
-sudo apt-get install -y git x11-xserver-utils
+sudo apt-get install -y git x11-xserver-utils unclutter
 # Package is "chromium" on Bookworm, "chromium-browser" on older releases.
 sudo apt-get install -y chromium || sudo apt-get install -y chromium-browser
 
