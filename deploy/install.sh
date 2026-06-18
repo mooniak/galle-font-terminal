@@ -36,9 +36,9 @@ fi
 touch "$LABWC_AUTOSTART"
 grep -qF "galle-kiosk.sh" "$LABWC_AUTOSTART" || echo "${LAUNCHER} &" >> "$LABWC_AUTOSTART"
 
-# Also drop an XDG autostart entry as a fallback for wayfire/X11 sessions.
-mkdir -p "${HOME_DIR}/.config/autostart"
-cp "${REPO_DIR}/deploy/galle-kiosk.desktop" "${HOME_DIR}/.config/autostart/"
+# Remove any old XDG autostart entry: labwc can honor it too, which would
+# start a SECOND kiosk loop and make the screen flicker/reload.
+rm -f "${HOME_DIR}/.config/autostart/galle-kiosk.desktop"
 
 echo ">> Installing auto-update timer..."
 sudo cp "${REPO_DIR}/deploy/galle-update.service" /etc/systemd/system/

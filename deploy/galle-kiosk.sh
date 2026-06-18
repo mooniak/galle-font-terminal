@@ -53,8 +53,8 @@ xset s noblank 2>/dev/null || true
 PROFILE="$HOME/.config/chromium"
 
 while true; do
-  # Pull latest, but never hang the kiosk if the network is slow/down.
-  cd "$REPO_DIR" 2>/dev/null && timeout 20 git pull --quiet 2>/dev/null || true
+  # NOTE: git is handled solely by the update service/timer. The launcher must
+  # never touch git, or it races the updater and causes spurious reloads.
 
   # Clear crash/exit flags so no "restore pages" bubble appears.
   if [ -f "$PROFILE/Default/Preferences" ]; then
