@@ -91,6 +91,7 @@ while true; do
     --check-for-update-interval=31536000 \
     --autoplay-policy=no-user-gesture-required \
     --ozone-platform=x11 \
+    --password-store=basic \
     --no-sandbox \
     --disable-dev-shm-usage \
     --disable-gpu \
