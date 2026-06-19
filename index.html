@@ -38,13 +38,12 @@
   }
 
   #header {
-    color: #004d15;
+    color: #ffffff;
     font-family: 'Noto Sans Sinhala', sans-serif;
     font-size: 20px;
     margin-bottom: 32px;
     letter-spacing: 0.1em;
     border-bottom: 1px solid #002a0b;
-    padding-bottom: 12px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -52,8 +51,11 @@
     position: sticky;
     top: 0;
     z-index: 1000;
-    background: #0a0a0a;
-    padding-top: 12px;
+    background: #23e21f;
+    /* Break out of the centered container to span the full viewport */
+    width: 100vw;
+    margin-left: calc(-50vw + 50%);
+    padding: 20px;
   }
 
   #save-btn {
@@ -189,7 +191,7 @@
 <body>
 <div id="terminal">
   <div id="header">
-    <span>Type with Galle Font <br> <br> Galle ෆොනුරුවෙන් ටයිප් කරන්න <br> <br>Galle எழுத்துருவில் தட்டச்சு செய்யவும்
+    <span>Type with Galle Font <br> Galle ෆොනුරුවෙන් ටයිප් කරන්න <br>Galle எழுத்துருவில் தட்டச்சு செய்யவும்
 
       </span>
     <div style="display:flex;gap:18px;align-items:center;">
