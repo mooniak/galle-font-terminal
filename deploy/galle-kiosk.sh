@@ -66,7 +66,9 @@ xset s off 2>/dev/null || true
 xset -dpms 2>/dev/null || true
 xset s noblank 2>/dev/null || true
 
-# Hide the mouse pointer (needs the "unclutter" package).
+# Hide the mouse pointer. unclutter only hides it after the first movement, so
+# also warp it off-screen at startup (needs "xdotool") so it starts hidden.
+command -v xdotool >/dev/null 2>&1 && xdotool mousemove 99999 99999 2>/dev/null || true
 pkill -x unclutter 2>/dev/null || true
 unclutter -idle 0 -root 2>/dev/null &
 
