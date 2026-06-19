@@ -1,7 +1,17 @@
 {
   "permissions": {
     "allow": [
-      "Bash(chmod +x embed-font.py)"
+      "Bash(chmod +x embed-font.py)",
+      "Bash(awk 'length\\($0\\) < 500 {print NR\": \"$0}' index.html)",
+      "Bash(grep -vE \"^[0-9]+: *$\")",
+      "Bash(/usr/bin/python3 -m pip install fonttools --quiet --user)",
+      "Bash(/usr/bin/python3 -c \"import fontTools; print\\('ok', fontTools.version\\)\")",
+      "Bash(/usr/bin/python3 -)",
+      "Bash(/usr/bin/python3 embed-font.py)",
+      "Bash(rm -f hbjs.js hb.wasm)",
+      "Bash(curl -sSL -o hbjs.js https://unpkg.com/harfbuzzjs@0.4.0/hbjs.js)",
+      "Bash(curl -sSL -o hb.wasm https://unpkg.com/harfbuzzjs@0.4.0/hb.wasm)",
+      "Bash(curl -sSL \"https://unpkg.com/harfbuzzjs@0.3.6/hb.wasm\" -o hb_036.wasm)"
     ]
   }
 }

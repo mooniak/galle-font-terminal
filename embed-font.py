@@ -36,6 +36,28 @@ MIME_BY_EXT = {
     ".woff2": "font/woff2",
 }
 
+# Marks the BASE_GIDS literal the page uses to tell live shaping which glyphs
+# come straight from the cmap (vs. produced by GSUB). Regenerated per embed.
+GIDS_RE = re.compile(r"(/\*BASEGIDS\*/)\[.*?\](/\*/BASEGIDS\*/)", re.DOTALL)
+
+
+def base_gids(font_path):
+    """Return the sorted glyph IDs reachable directly from Unicode via cmap.
+
+    These are the "base" glyphs; any shaped glyph NOT in this set was produced
+    by a GSUB substitution (conjunct, ligature, reph, stylistic alternate),
+    which is how the page counts substitutions live. Returns None if fontTools
+    is unavailable.
+    """
+    try:
+        from fontTools.ttLib import TTFont
+    except ImportError:
+        return None
+
+    f = TTFont(font_path)
+    idx = {name: i for i, name in enumerate(f.getGlyphOrder())}
+    return sorted({idx[name] for name in f.getBestCmap().values()})
+
 
 def main(argv):
     script_dir = os.path.dirname(os.path.abspath(__file__))
@@ -70,6 +92,21 @@ def main(argv):
             "could not find a `src: url('data:font/...;base64,...')` line in "
             f"{html_path} — is the @font-face data URI present?"
         )
+
+    # Refresh the BASE_GIDS set used by live shaping (best effort).
+    gids = base_gids(font_path)
+    if gids is None:
+        print("note: fontTools not installed — left BASE_GIDS as-is "
+              "(pip install fonttools to auto-update it)")
+    else:
+        import json
+        literal = json.dumps(gids, separators=(",", ":"))
+        new_html, gn = GIDS_RE.subn(
+            lambda m: m.group(1) + literal + m.group(2), new_html, count=1)
+        if gn:
+            print(f"BASE_GIDS: {len(gids)} cmap glyphs")
+        else:
+            print("warning: BASE_GIDS markers not found in HTML")
 
     if new_html == html:
         print(f"font already up to date in {os.path.basename(html_path)} "
