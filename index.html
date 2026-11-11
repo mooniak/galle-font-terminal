@@ -771,68 +771,24 @@ try { module.exports = hbjs; } catch(e) {}
   document.addEventListener('keydown', () => trap.focus());
   trap.addEventListener('blur', () => trap.focus());
 
-  // Unlocking locked text: pressing Backspace at the locked boundary (caret at
-  // the start of the editable buffer) doesn't delete immediately. It takes
-  // UNLOCK_PRESSES presses to remove ONE locked character. A counter next to
-  // the padlock counts down (first press -> 9, the press showing 0 deletes).
-  // Pausing for UNLOCK_RESET_DELAY resets the counter back to 10.
-  const UNLOCK_PRESSES = 10;
-  const UNLOCK_RESET_DELAY = 1500;
-  let lockMark = null, lockCount = null;
-  let bsCount = 0, bsResetTimer = null;
-
-  function buildLockMark() {
-    lockMark = document.createElement('span');
-    lockMark.id = 'lock-mark';
-    const padlock = document.createElement('span');
-    padlock.className = 'padlock'; // shape drawn via CSS ::before/::after
-    lockCount = document.createElement('span');
-    lockCount.className = 'count';
-    lockMark.appendChild(padlock);
-    lockMark.appendChild(lockCount);
-  }
-
-  function showLockMark(remaining) {
-    if (!lockMark) buildLockMark();
-    lockCount.textContent = remaining;
-    output.appendChild(lockMark); // re-append in case render() rebuilt output
-    void lockMark.offsetWidth;    // restart the fade-in on repeated presses
-    lockMark.classList.add('show');
-  }
-
-  function resetUnlock() {
-    bsCount = 0;
-    if (lockMark) lockMark.classList.remove('show');
-  }
-
-  function backspaceAtBoundary() {
-    bsCount++;
-    const remaining = UNLOCK_PRESSES - bsCount; // 1st press -> 9 ... 10th -> 0
-    if (bsCount >= UNLOCK_PRESSES) {
-      // Remove one locked code point (handles surrogate pairs).
-      const cps = Array.from(lockedText);
-      cps.pop();
-      lockedText = cps.join('');
-      text = lockedText + trap.value;
-      persist();
-      render();        // rebuilds output, so re-show the mark below
-      bsCount = 0;     // reset count for the next character
-    }
-    showLockMark(remaining);
-    if (bsResetTimer) clearTimeout(bsResetTimer);
-    bsResetTimer = setTimeout(resetUnlock, UNLOCK_RESET_DELAY);
-  }
-
   trap.addEventListener('keydown', function(e) {
     if ((e.ctrlKey || e.metaKey) && e.key === 's') {
       e.preventDefault();
       saveText();
       return;
     }
-    if (e.key === 'Backspace' && lockedText &&
-        trap.selectionStart === 0 && trap.selectionEnd === 0) {
+    // Backspace is disabled entirely.
+    if (e.key === 'Backspace' || e.keyCode === 8) {
       e.preventDefault();
-      backspaceAtBoundary();
+    }
+  });
+  // Also block any backward-deletion that bypasses the key event (IME, etc.).
+  trap.addEventListener('beforeinput', function(e) {
+    if (e.inputType === 'deleteContentBackward' ||
+        e.inputType === 'deleteWordBackward' ||
+        e.inputType === 'deleteSoftLineBackward' ||
+        e.inputType === 'deleteHardLineBackward') {
+      e.preventDefault();
     }
   });
 
